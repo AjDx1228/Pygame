@@ -1,34 +1,21 @@
-import pygame
-
+from pygame import *
 import config as c
-from game_object import GameObject
 
-from box import Box
+MOVE_SPEED = 10
+WIDTH = 80
+HEIGHT = 20
+COLOR =  "#FF0000"
 
-
-class Lift(GameObject):
-    def __init__(self, x, y, w, h, color, offset):
-        GameObject.__init__(self, x, y, w, h)
-        self.start_position = x
-        self.color = color
-        self.offset = offset
-        self.reset_flag = False
-
-    def draw(self, surface):
-        pygame.draw.rect(surface, self.color, self.bounds)
-
-    def handle(self, key):
-        pass
+class Lift(sprite.Sprite):
+    def __init__(self, x, y):
+        sprite.Sprite.__init__(self)
+        self.xvel = MOVE_SPEED   #скорость перемещения. 0 - стоять на месте
+        self.startX = x # Начальная позиция Х, пригодится когда будем переигрывать уровень
+        self.startY = y
+        self.image = Surface((WIDTH,HEIGHT))
+        self.image.fill(Color(COLOR))
+        self.rect = Rect(x, y, WIDTH, HEIGHT) # прямоугольный объект 
 
     def update(self):
-        if self.reset_flag:
-            self.move(-c.screen_width + self.start_position, 0)
-            self.reset_flag = False
-            return
-
-        dx = self.offset
-        self.move(dx, 0)
-    
-    def set_reset_flag(self, value):
-        self.reset_flag = value
+        self.rect.x += self.xvel
 
