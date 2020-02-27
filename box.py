@@ -1,6 +1,7 @@
 from pygame import *
 import config as c
 import random
+import pygame
 
 WIDTH = 40
 HEIGHT = 40
@@ -15,8 +16,8 @@ class Box(sprite.Sprite):
         self.startY = y
         self.yvel = 0 # скорость вертикального перемещения
         self.onGround = False # На земле ли я?
-        self.image = Surface((WIDTH,HEIGHT))
-        self.image.fill(Color(COLOR))
+        self.image = image.load("images/box.jpg")
+        self.image = pygame.transform.scale(self.image, (WIDTH, HEIGHT))
         self.rect = Rect(x, y, WIDTH, HEIGHT) # прямоугольный объект 
 
         self.has_border_collision = False
@@ -49,23 +50,23 @@ class Box(sprite.Sprite):
         if not boxes:
             return (False, False, False, False)
 
+        has_from_left = False
+        has_from_right = False
+        has_from_top = False
+        has_any_collisions = False
         for b in boxes:
             if self == b:
                 continue
             if sprite.collide_rect(self, b):
-                has_from_left = False
-                has_from_right = False
-                has_from_top = False
+                has_any_collisions = True
                 if b.rect.right > self.rect.right and b.rect.top == self.rect.top:
                     has_from_right = True
                 if b.rect.left < self.rect.left and b.rect.top == self.rect.top:
                     has_from_left = True
                 if self.yvel > 0 and self.rect.top < b.rect.top:
                     has_from_top = True
-
-                return (True, has_from_left, has_from_right, has_from_top)
-
-        return (False, False, False, False)
+                    
+        return (has_any_collisions, has_from_left, has_from_right, has_from_top)
 
     def has_collide_with_player(self, player):
         if not player:

@@ -1,11 +1,27 @@
 from pygame import *
+import pygame
 import config as c
+import pyganim
+
 MOVE_SPEED = 10
-WIDTH = 20
+WIDTH = 25
 HEIGHT = 40
 COLOR =  "#888888"
 JUMP_POWER = 10
 GRAVITY = 0.35 # Сила, которая будет тянуть нас вниз
+ANIMATION_DELAY = 1 # скорость смены кадров
+
+ANIMATION_RIGHT = ['images/r1.png',
+            'images/r2.png',
+            'images/r3.png',
+            'images/r4.png',
+            'images/r5.png']
+ANIMATION_LEFT = ['images/l1.png',
+            'images/l2.png',
+            'images/l3.png',
+            'images/l4.png',
+            'images/l5.png']
+ANIMATION_IDE = [('images/0.png', ANIMATION_DELAY)]
 
 class Player(sprite.Sprite):
     def __init__(self, x, y):
@@ -17,6 +33,9 @@ class Player(sprite.Sprite):
         self.onGround = False # На земле ли я?
         self.image = Surface((WIDTH,HEIGHT))
         self.image.fill(Color(COLOR))
+        self.image.set_colorkey(Color(COLOR)) # делаем фон прозрачным
+        self.image = pygame.transform.scale(self.image, (WIDTH, HEIGHT))
+
         self.rect = Rect(x, y, WIDTH, HEIGHT) # прямоугольный объект 
 
         self.left = False 
@@ -24,6 +43,27 @@ class Player(sprite.Sprite):
         self.up = False
         self.has_border_collision = True
         self.has_box_collision = False
+
+        #        Анимация движения вправо
+        boltAnim = []
+        for anim in ANIMATION_RIGHT:
+            boltAnim.append((anim, ANIMATION_DELAY))
+        self.boltAnimRight = pyganim.PygAnimation(boltAnim)
+        self.boltAnimRight.scale((WIDTH,HEIGHT))
+        self.boltAnimRight.play()
+        #        Анимация движения влево        
+        boltAnim = []
+
+        for anim in ANIMATION_LEFT:
+            boltAnim.append((anim, ANIMATION_DELAY))
+        self.boltAnimLeft = pyganim.PygAnimation(boltAnim)
+        self.boltAnimLeft.scale((WIDTH,HEIGHT))
+        self.boltAnimLeft.play()
+        
+        self.boltAnimStay = pyganim.PygAnimation(ANIMATION_IDE)
+        self.boltAnimStay.scale((WIDTH,HEIGHT))
+        self.boltAnimStay.play()
+        self.boltAnimStay.blit(self.image, (0, 0)) # По-умолчанию, стоим
 
     def handle_keyup(self, key):
         if key == K_UP:
@@ -69,12 +109,22 @@ class Player(sprite.Sprite):
                              
         if self.left:
             self.xvel = -MOVE_SPEED # Лево = x- n
+            self.image.fill(Color(COLOR))
+            self.boltAnimLeft.blit(self.image, (0, 0))
+            self.image = pygame.transform.scale(self.image, (WIDTH, HEIGHT))
  
         if self.right:
+            self.image.fill(Color(COLOR))
             self.xvel = MOVE_SPEED # Право = x + n
+            self.boltAnimRight.blit(self.image, (0, 0))
+            self.image = pygame.transform.scale(self.image, (WIDTH, HEIGHT))
+
          
         if not(self.left or self.right): # стоим, когда нет указаний идти
             self.xvel = 0
+            self.image.fill(Color(COLOR))
+            self.boltAnimStay.blit(self.image, (0, 0))
+            self.image = pygame.transform.scale(self.image, (WIDTH, HEIGHT))
             
         if not self.onGround:
             self.yvel +=  GRAVITY
