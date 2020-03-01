@@ -10,7 +10,6 @@ from pygame import *
 from lift import Lift
 import config as c
 from player import Player
-from border import Border
 from game import Game
 from box import Box
 
